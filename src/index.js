@@ -5,16 +5,17 @@ import isEqual from 'lodash.isequal';
 import { Picker } from '@react-native-picker/picker';
 import { defaultStyles } from './styles';
 import { Dimensions } from 'react-native';
-
-// Measuring the modal before rendering is not working reliably, so we need to hardcode the height
-// This height was tested thoroughly on several iPhone Models (from iPhone 8 to 14 Pro)
-const IOS_MODAL_HEIGHT = 262;
+import { PickerAvoidingView } from './PickerAvoidingView';
+import { PickerStateContext, PickerStateProvider } from './PickerStateProvider';
+import { IOS_MODAL_HEIGHT } from './constants';
 
 const preserveSpaces = (label) => {
     return label.replace(/ /g, '\u00a0');
 };
 
 export default class RNPickerSelect extends PureComponent {
+    static contextType = PickerStateContext;
+
     static propTypes = {
         onValueChange: PropTypes.func.isRequired,
         items: PropTypes.arrayOf(
@@ -245,23 +246,34 @@ export default class RNPickerSelect extends PureComponent {
             // If TextInput is below picker modal, scroll up
             if (textInputBottomY > modalY) {
                 this.props.scrollViewRef.current.scrollTo({
-                    y: textInputBottomY - modalY + this.props.scrollViewContentOffsetY,
+                    // Add 10 pixels for a more visually pleasant effect
+                    y: textInputBottomY + 10 - modalY + this.props.scrollViewContentOffsetY,
                 });
             }
         });
     }
 
-    triggerOpenCloseCallbacks() {
+    triggerCallbacks() {
         const { onOpen, onClose } = this.props;
         const { showPicker } = this.state;
 
         if (!showPicker && onOpen) {
             onOpen();
-            this.scrollToInput();
         }
 
-        if (showPicker && onClose) {
-            onClose();
+        if (showPicker) {
+            if (onClose) {
+                onClose();
+            }
+
+            // If the picker is currently shown, toggling it will start closing
+            // the modal on iOS. Let's handle this here, instead on relying on
+            // Modal's onDismiss, because onDismiss is fired _after_ the modal
+            // closing animation ends. PickerAvoidingView behaves better
+            // (visually) when it adjusts right after the modal closing starts.
+            if (this.context) {
+                this.context.setIsModalShown(false);
+            }
         }
     }
 
@@ -291,7 +303,7 @@ export default class RNPickerSelect extends PureComponent {
             return;
         }
 
-        this.triggerOpenCloseCallbacks();
+        this.triggerCallbacks();
 
         if (Keyboard.isVisible()) {
             const keyboardListener = Keyboard.addListener('keyboardDidHide', () => {
@@ -481,6 +493,13 @@ export default class RNPickerSelect extends PureComponent {
                     supportedOrientations={['portrait', 'landscape']}
                     onOrientationChange={this.onOrientationChange}
                     {...modalProps}
+                    onShow={() => {
+                        if (this.context) {
+                            this.context.setIsModalShown(true);
+                        }
+
+                        this.scrollToInput();
+                    }}
                 >
                     <TouchableOpacity
                         style={[defaultStyles.modalViewTop, style.modalViewTop]}
@@ -635,4 +654,4 @@ export default class RNPickerSelect extends PureComponent {
     }
 }
 
-export { defaultStyles };
+export { defaultStyles, PickerStateProvider, PickerAvoidingView };
