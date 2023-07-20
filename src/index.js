@@ -181,6 +181,12 @@ export default class RNPickerSelect extends PureComponent {
         }
     };
 
+    componentWillUnmount() {
+        if (this.context) {
+            this.context.setIsModalShown(false);
+        }
+    }
+
     onUpArrow() {
         const { onUpArrow } = this.props;
 
