@@ -15,7 +15,6 @@ import { Picker } from '@react-native-picker/picker';
 import { defaultStyles } from './styles';
 import { PickerAvoidingView } from './PickerAvoidingView';
 import { PickerStateContext, PickerStateProvider } from './PickerStateProvider';
-import { IOS_MODAL_HEIGHT } from './constants';
 
 const preserveSpaces = (label) => {
     return label.replace(/ /g, '\u00a0');
@@ -246,7 +245,7 @@ export default class RNPickerSelect extends PureComponent {
         return {};
     }
 
-    scrollToInput() {
+    scrollToInput(iosModalHeight) {
         if (
             this.props.scrollViewRef == null ||
             this.props.scrollViewContentOffsetY == null ||
@@ -259,10 +258,12 @@ export default class RNPickerSelect extends PureComponent {
             // Bottom y-position of TextInput on screen
             const textInputBottomY = y + height;
             // Top y-position of picker modal on screen
-            const modalY = Dimensions.get('window').height - IOS_MODAL_HEIGHT;
+            const modalY = Dimensions.get('window').height - /* IOS_MODAL_HEIGHT */ iosModalHeight;
 
             // If TextInput is below picker modal, scroll up
             if (textInputBottomY > modalY) {
+                console.log('scroll!!!');
+
                 this.props.scrollViewRef.current.scrollTo({
                     // Add 10 pixels for a more visually pleasant effect
                     y: textInputBottomY + 10 - modalY + this.props.scrollViewContentOffsetY,
@@ -283,6 +284,11 @@ export default class RNPickerSelect extends PureComponent {
 
         if (!showPicker && onOpen) {
             onOpen();
+            this.setState({ shouldScrollToInputOnNextMeasure: true });
+            if (this.context && this.context.setIsModalShown) {
+                console.log('setIsModalShown');
+                this.context.setIsModalShown(true);
+            }
         }
 
         if (showPicker && onClose) {
@@ -502,7 +508,6 @@ export default class RNPickerSelect extends PureComponent {
     renderIOS() {
         const { style, modalProps, pickerProps, touchableWrapperProps } = this.props;
         const { animationType, orientation, selectedItem, showPicker } = this.state;
-
         return (
             <View style={[defaultStyles.viewContainer, style.viewContainer]}>
                 <TouchableOpacity
@@ -524,41 +529,51 @@ export default class RNPickerSelect extends PureComponent {
                     onOrientationChange={this.onOrientationChange}
                     {...modalProps}
                     onShow={() => {
-                        if (this.context && this.context.setIsModalShown) {
-                            this.context.setIsModalShown(true);
-                        }
-
                         if (modalProps.onShow) {
                             modalProps.onShow();
                         }
-
-                        this.scrollToInput();
                     }}
                 >
-                    <TouchableOpacity
-                        style={[defaultStyles.modalViewTop, style.modalViewTop]}
-                        testID="ios_modal_top"
-                        onPress={() => {
-                            this.togglePicker(true);
-                        }}
-                    />
-                    {this.renderInputAccessoryView()}
-                    <View
-                        style={[
-                            defaultStyles.modalViewBottom,
-                            this.isDarkTheme() ? defaultStyles.modalViewBottomDark : {},
-                            { height: orientation === 'portrait' ? 215 : 162 },
-                            this.isDarkTheme() ? style.modalViewBottomDark : style.modalViewBottom,
-                        ]}
-                    >
-                        <Picker
-                            testID="ios_picker"
-                            onValueChange={this.onValueChange}
-                            selectedValue={selectedItem.value}
-                            {...pickerProps}
+                    <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+                        <View
+                            onLayout={({ nativeEvent: { layout } }) => {
+                                if (this.state.shouldScrollToInputOnNextMeasure) {
+                                    setTimeout(() => {
+                                        this.scrollToInput(layout.height);
+                                        this.setState({ shouldScrollToInputOnNextMeasure: false });
+                                    }, 100);
+                                }
+                            }}
                         >
-                            {this.renderPickerItems()}
-                        </Picker>
+                            {/* <View style={{ flex: 1 }} /> */}
+                            <TouchableOpacity
+                                style={[defaultStyles.modalViewTop, style.modalViewTop]}
+                                testID="ios_modal_top"
+                                onPress={() => {
+                                    this.togglePicker(true);
+                                }}
+                            />
+                            {this.renderInputAccessoryView()}
+                            <View
+                                style={[
+                                    defaultStyles.modalViewBottom,
+                                    this.isDarkTheme() ? defaultStyles.modalViewBottomDark : {},
+                                    { height: orientation === 'portrait' ? 215 : 162 },
+                                    this.isDarkTheme()
+                                        ? style.modalViewBottomDark
+                                        : style.modalViewBottom,
+                                ]}
+                            >
+                                <Picker
+                                    testID="ios_picker"
+                                    onValueChange={this.onValueChange}
+                                    selectedValue={selectedItem.value}
+                                    {...pickerProps}
+                                >
+                                    {this.renderPickerItems()}
+                                </Picker>
+                            </View>
+                        </View>
                     </View>
                 </Modal>
             </View>
