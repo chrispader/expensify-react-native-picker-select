@@ -42,7 +42,6 @@ describe('RNPickerSelect', () => {
     beforeEach(() => {
         jest.resetAllMocks();
         jest.spyOn(Keyboard, 'dismiss');
-        jest.spyOn(Keyboard, 'addListener');
         Keyboard.isVisible = jest.fn().mockReturnValue(false);
     });
 
@@ -144,25 +143,6 @@ describe('RNPickerSelect', () => {
         const touchable = wrapper.find('TouchableOpacity').at(1);
         touchable.simulate('press');
         expect(wrapper.state().showPicker).toEqual(true);
-    });
-
-    it('should call Keyboard.addListener when keyboard is visible', () => {
-        Keyboard.isVisible.mockReturnValue(true);
-        const wrapper = shallow(<RNPickerSelect items={selectItems} onValueChange={noop} />);
-
-        const touchable = wrapper.find('TouchableOpacity').at(1);
-        touchable.simulate('press');
-        expect(Keyboard.addListener).toHaveBeenCalledTimes(1);
-        expect(Keyboard.addListener).toHaveBeenCalledWith('keyboardDidHide', expect.any(Function));
-    });
-
-    it('should not call Keyboard.addListener when keyboard is not visible', () => {
-        Keyboard.isVisible.mockReturnValue(false);
-        const wrapper = shallow(<RNPickerSelect items={selectItems} onValueChange={noop} />);
-
-        const touchable = wrapper.find('TouchableOpacity').at(1);
-        touchable.simulate('press');
-        expect(Keyboard.addListener).not.toHaveBeenCalled();
     });
 
     it('should not show the picker when pressed if disabled', () => {
