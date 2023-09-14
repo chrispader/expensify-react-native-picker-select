@@ -24,18 +24,19 @@ export class PickerStateProvider extends React.Component {
         this.state = {
             isModalShown: false,
         };
+    }
 
-        this.pickerStateContext = {
+    render() {
+        // eslint-disable-next-line react/jsx-no-constructed-context-values
+        const context = {
             isModalShown: this.state.isModalShown,
             setIsModalShown: (isModalShown) => {
                 this.setState({ isModalShown });
             },
         };
-    }
 
-    render() {
         return (
-            <PickerStateContext.Provider value={this.pickerStateContext}>
+            <PickerStateContext.Provider value={context}>
                 {this.props.children}
             </PickerStateContext.Provider>
         );
