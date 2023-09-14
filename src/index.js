@@ -258,12 +258,10 @@ export default class RNPickerSelect extends PureComponent {
             // Bottom y-position of TextInput on screen
             const textInputBottomY = y + height;
             // Top y-position of picker modal on screen
-            const modalY = Dimensions.get('window').height - /* IOS_MODAL_HEIGHT */ iosModalHeight;
+            const modalY = Dimensions.get('window').height - iosModalHeight;
 
             // If TextInput is below picker modal, scroll up
             if (textInputBottomY > modalY) {
-                console.log('scroll!!!');
-
                 this.props.scrollViewRef.current.scrollTo({
                     // Add 10 pixels for a more visually pleasant effect
                     y: textInputBottomY + 10 - modalY + this.props.scrollViewContentOffsetY,
@@ -286,7 +284,6 @@ export default class RNPickerSelect extends PureComponent {
             onOpen();
             this.setState({ shouldScrollToInputOnNextMeasure: true });
             if (this.context && this.context.setIsModalShown) {
-                console.log('setIsModalShown');
                 this.context.setIsModalShown(true);
             }
         }
