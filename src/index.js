@@ -323,26 +323,6 @@ export default class RNPickerSelect extends PureComponent {
         );
     }
 
-    togglePicker(animate = false, postToggleCallback) {
-        const { disabled } = this.props;
-
-        if (disabled) {
-            return;
-        }
-
-        this.triggerCallbacks();
-
-        if (Keyboard.isVisible()) {
-            const keyboardListener = Keyboard.addListener('keyboardDidHide', () => {
-                this.updatePickerState(animate, postToggleCallback);
-                keyboardListener.remove();
-            });
-            Keyboard.dismiss();
-        } else {
-            this.updatePickerState(animate, postToggleCallback);
-        }
-    }
-
     renderPickerItems() {
         const { items } = this.state;
         const defaultItemColor = this.isDarkTheme() ? '#fff' : undefined;
