@@ -509,8 +509,13 @@ export default class RNPickerSelect extends PureComponent {
                     onOrientationChange={this.onOrientationChange}
                     {...modalProps}
                     onShow={() => {
-                        if (this.context) {
+                        if (this.context && this.context.setIsModalShown) {
+                            console.log({ c: this.context });
                             this.context.setIsModalShown(true);
+                        }
+
+                        if (modalProps.onShow) {
+                            modalProps.onShow();
                         }
 
                         this.scrollToInput();
