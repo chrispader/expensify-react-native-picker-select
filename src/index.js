@@ -299,7 +299,7 @@ export default class RNPickerSelect extends PureComponent {
             // Modal's onDismiss, because onDismiss is fired _after_ the modal
             // closing animation ends. PickerAvoidingView behaves better
             // (visually) when it adjusts right after the modal closing starts.
-            if (this.context) {
+            if (this.context && this.context.setIsModalShown) {
                 this.context.setIsModalShown(false);
             }
         }
@@ -525,7 +525,6 @@ export default class RNPickerSelect extends PureComponent {
                     {...modalProps}
                     onShow={() => {
                         if (this.context && this.context.setIsModalShown) {
-                            console.log({ c: this.context });
                             this.context.setIsModalShown(true);
                         }
 
