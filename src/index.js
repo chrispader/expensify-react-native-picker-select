@@ -510,7 +510,6 @@ export default class RNPickerSelect extends PureComponent {
                     {...modalProps}
                     onShow={() => {
                         if (this.context && this.context.setIsModalShown) {
-                            console.log({ c: this.context });
                             this.context.setIsModalShown(true);
                         }
 
