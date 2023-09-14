@@ -1,9 +1,4 @@
 module.exports = {
-    parserOptions: {
-        sourceType: 'module',
-        ecmaVersion: 2022,
-    },
-    extends: ['eslint:recommended', 'plugin:react/recommended'],
     settings: {
         react: {
             version: 'detect',
@@ -13,15 +8,41 @@ module.exports = {
         node: true,
         jest: true,
         es6: true,
+        browser: true,
+        es2021: true,
     },
-    globals: {
-        shallow: true,
+    extends: ['plugin:react/recommended', 'airbnb', 'airbnb/hooks', 'prettier'],
+    plugins: ['react', 'react-native'],
+    overrides: [
+        {
+            env: {
+                node: true,
+            },
+            files: ['.eslintrc.{js,cjs}'],
+            parserOptions: {
+                sourceType: 'script',
+            },
+        },
+    ],
+    parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
     },
     rules: {
         'import/no-extraneous-dependencies': 0,
         'lodash/import-scope': 0,
         'lodash/prefer-lodash-method': 0,
         'lodash/prefer-noop': 0,
-        'react/prop-types': 'off',
+        'import/prefer-default-export': 0,
+        'react/prop-types': 0,
+        'react/jsx-props-no-spreading': 0,
+        'react/destructuring-assignment': 0,
+        'react/static-property-placement': 0,
+        'react/forbid-prop-types': 0,
+        'react/no-arrow-function-lifecycle': 0,
+        'react/no-unused-class-component-methods': 0,
+        'react/jsx-filename-extension': 0,
+        'arrow-body-style': 0,
+        'default-param-last': 0,
     },
 };
