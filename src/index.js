@@ -50,9 +50,9 @@ export default class RNPickerSelect extends PureComponent {
         onOpen: PropTypes.func,
         useNativeAndroidPickerStyle: PropTypes.bool,
         fixAndroidTouchableBug: PropTypes.bool,
-        darkTheme: PropTypes.bool,
         scrollViewRef: PropTypes.any,
         scrollViewContentOffsetY: PropTypes.number,
+        darkTheme: PropTypes.bool,
 
         // Custom Modal props (iOS only)
         doneText: PropTypes.string,
@@ -107,9 +107,9 @@ export default class RNPickerSelect extends PureComponent {
         touchableWrapperProps: {},
         Icon: null,
         InputAccessoryView: null,
+        scrollViewRef: undefined,
+        scrollViewContentOffsetY: undefined,
         darkTheme: false,
-        scrollViewRef: null,
-        scrollViewContentOffsetY: 0,
     };
 
     static handlePlaceholder({ placeholder }) {
@@ -264,7 +264,8 @@ export default class RNPickerSelect extends PureComponent {
             // If TextInput is below picker modal, scroll up
             if (textInputBottomY > modalY) {
                 this.props.scrollViewRef.current.scrollTo({
-                    y: textInputBottomY - modalY + this.props.scrollViewContentOffsetY,
+                    // Add 10 pixels for a more visually pleasant effect
+                    y: textInputBottomY + 10 - modalY + this.props.scrollViewContentOffsetY,
                 });
             }
         });
@@ -282,11 +283,25 @@ export default class RNPickerSelect extends PureComponent {
 
         if (!showPicker && onOpen) {
             onOpen();
-            this.scrollToInput();
         }
 
         if (showPicker && onClose) {
             onClose(donePressed);
+        }
+
+        if (showPicker) {
+            if (onClose) {
+                onClose();
+            }
+
+            // If the picker is currently shown, toggling it will start closing
+            // the modal on iOS. Let's handle this here, instead on relying on
+            // Modal's onDismiss, because onDismiss is fired _after_ the modal
+            // closing animation ends. PickerAvoidingView behaves better
+            // (visually) when it adjusts right after the modal closing starts.
+            if (this.context && this.context.setIsModalShown) {
+                this.context.setIsModalShown(false);
+            }
         }
     }
 

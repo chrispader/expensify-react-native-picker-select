@@ -1,13 +1,5 @@
 module.exports = {
-    settings: {
-        react: {
-            version: 'detect',
-        },
-    },
     env: {
-        node: true,
-        jest: true,
-        es6: true,
         browser: true,
         es2021: true,
     },
@@ -30,9 +22,6 @@ module.exports = {
     },
     rules: {
         'import/no-extraneous-dependencies': 0,
-        'lodash/import-scope': 0,
-        'lodash/prefer-lodash-method': 0,
-        'lodash/prefer-noop': 0,
         'import/prefer-default-export': 0,
         'react/prop-types': 0,
         'react/jsx-props-no-spreading': 0,
