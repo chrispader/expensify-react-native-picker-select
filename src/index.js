@@ -165,7 +165,6 @@ export default class RNPickerSelect extends PureComponent {
         this.scrollToInput = this.scrollToInput.bind(this);
         this.togglePicker = this.togglePicker.bind(this);
         this.renderInputAccessoryView = this.renderInputAccessoryView.bind(this);
-        this.updatePickerState = this.updatePickerState.bind(this);
     }
 
     componentDidUpdate = (prevProps, prevState) => {
