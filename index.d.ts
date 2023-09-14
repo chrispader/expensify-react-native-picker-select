@@ -1,5 +1,6 @@
 import {
     ModalProps,
+    ScrollView,
     TextInputProps,
     TextStyle,
     TouchableOpacityProps,
@@ -89,6 +90,8 @@ export interface PickerSelectProps {
     touchableWrapperProps?: CustomTouchableWrapperProps;
     Icon?: React.ReactNode;
     InputAccessoryView?: React.ReactNode;
+    scrollViewRef?: React.RefObject<ScrollView>;
+    scrollViewContentOffsetY?: number;
     darkTheme?: boolean;
 }
 
