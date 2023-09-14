@@ -24,18 +24,18 @@ export class PickerStateProvider extends React.Component {
         this.state = {
             isModalShown: false,
         };
-    }
 
-    render() {
-        const context = {
+        this.pickerStateContext = {
             isModalShown: this.state.isModalShown,
             setIsModalShown: (isModalShown) => {
                 this.setState({ isModalShown });
             },
         };
+    }
 
+    render() {
         return (
-            <PickerStateContext.Provider value={context}>
+            <PickerStateContext.Provider value={this.pickerStateContext}>
                 {this.props.children}
             </PickerStateContext.Provider>
         );
